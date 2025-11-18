@@ -68,7 +68,7 @@ cd _oidc
 cp backend.hcl.example backend.hcl
 vi backend.hcl
 
-bucket = "< Outputsのtfstate_bucket_nameで控えたバケット名 >"
+bucket = "<Outputsのtfstate_bucket_nameで控えたバケット名>"
 key    = "oidc/terraform.tfstate"
 region = "us-east-1"
 ```
@@ -77,6 +77,19 @@ region = "us-east-1"
 
 ```console
 terraform init -backend-config=backend.hcl
+```
+
+`terraform.tfvars`を追加します。
+
+```console
+cp terraform.tfvars.example terraform.tfvars
+vi terraform.tfvars
+
+repository                    = "<GitHub Actionsでplan/applyをしたいリポジトリ名>" # ex) daylight55/terraform-cicd-example
+account_id                    = "<AWSアカウントID。ARNの作成で利用します。>"
+aws_terraform_plan_role_name  = "gha-plan"
+aws_terraform_apply_role_name = "gha-apply"
+
 ```
 
 リソースを作成します。

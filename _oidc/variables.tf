@@ -1,17 +1,6 @@
-variable "tfstate_bucket" {
-  description = "S3 bucket name for storing Terraform state"
-  type        = string
-}
-
 variable "repository" {
   description = "GitHub repository in owner/repo format"
   type        = string
-}
-
-variable "environment" {
-  description = "GitHub Actions environment name (e.g. staging, production)"
-  type        = string
-  default     = "dev"
 }
 
 variable "account_id" {
