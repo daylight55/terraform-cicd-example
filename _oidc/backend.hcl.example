@@ -1,0 +1,3 @@
+bucket = "your-bucket-name"
+key    = "oidc/terraform.tfstate"
+region = "us-east-1"

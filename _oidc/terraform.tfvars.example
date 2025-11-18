@@ -1,0 +1,6 @@
+tfstate_bucket                = "your tfstate_bucket"
+repository                    = "daylight55/terraform-cicd-example"
+environment                   = "dev"
+account_id                    = "12345678901"
+aws_terraform_plan_role_name  = "gha-plan"
+aws_terraform_apply_role_name = "gha-apply"

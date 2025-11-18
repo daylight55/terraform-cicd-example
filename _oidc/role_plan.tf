@@ -27,7 +27,7 @@ data "aws_iam_policy_document" "gha_plan_assume" {
       variable = "token.actions.githubusercontent.com:sub"
       values = [
         # https://github.com/daylight55/terraform-cicd-example/tree/main
-        "repo:daylight55/terraform-cicd-example:ref:refs/heads/*"
+        "repo:${var.repository}:ref:refs/heads/*"
       ]
     }
   }
