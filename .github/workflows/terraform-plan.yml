@@ -1,8 +1,6 @@
-name: terraform-actions
+name: terraform-plan
 
 on:
-  push:
-    branches: ["main"]
   pull_request:
     branches: ["main"]
 
@@ -16,9 +14,6 @@ env:
 jobs:
   terraform:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: aws/terraform/github
     steps:
       - uses: actions/checkout@v4
 
@@ -35,24 +30,16 @@ jobs:
           role-session-name: "gha-terraform-plan"
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Configure AWS credentials (apply)
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ secrets.AWS_TERRAFORM_APPLY_ROLE }}
-          role-session-name: "gha-terraform-apply"
-          aws-region: ${{ env.AWS_REGION }}
-
       - name: Terraform Init
-        run: terraform init -input=false
+        run: |
+          terraform init -migrate-state\
+            -backend-config="bucket=${{ secrets.TF_BACKEND_S3_BUCKET }}" \
+            -backend-config="key=root/terraform.tfstate" \
+            -backend-config="region=${{ env.AWS_REGION }}"
 
       - name: Terraform Validate
         run: terraform validate
 
       - name: Terraform Plan
         if: github.event_name == 'pull_request'
-        run: terraform plan -input=false
-
-      - name: Terraform Apply
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: terraform apply -auto-approve -input=false
+        run: terraform plan
