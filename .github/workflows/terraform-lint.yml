@@ -24,7 +24,7 @@ jobs:
           curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
 
       - name: Run tflint (SARIF)
-        run: tflint --format sarif > tflint.sarif
+        run: tflint --format sarif | tee tflint.sarif
 
       - name: Setup reviewdog
         uses: reviewdog/action-setup@v1
