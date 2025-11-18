@@ -6,6 +6,6 @@ resource "aws_s3_bucket" "example" {
   bucket = "example-bucket-${random_pet.this.id}"
 
   tags = {
-    Region = "us-east-1"
+    Region = "ap-northeast-1"
   }
 }
