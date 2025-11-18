@@ -66,4 +66,6 @@ jobs:
           version: v4.13.0
 
       - name: Terraform Apply
-        run: tfcmt apply -- terraform apply -auto-approve
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: tfcmt apply -- terraform apply -auto-approve --no-color -input=false

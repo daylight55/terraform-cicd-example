@@ -45,4 +45,6 @@ jobs:
           version: v4.13.0
 
       - name: Terraform Plan
-        run: tfcmt plan --patch -- terraform plan
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: tfcmt plan --patch -- terraform plan -no-color -input=false
