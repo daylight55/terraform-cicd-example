@@ -5,7 +5,6 @@ on:
     types: [opened, synchronize, reopened]
 
 permissions:
-  contents: write          # fmt / docs の自動コミット用
   pull-requests: write     # reviewdog / tfcmt / Infracost コメント用
   security-events: write   # （必要なら）SARIF を Code Scanning に上げるとき用
 
@@ -33,6 +32,8 @@ jobs:
           reviewdog_version: latest
 
       - name: Comment tflint results via reviewdog
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           reviewdog \
             -f=sarif \
