@@ -1,2 +1,108 @@
-# terraform-cicd-example
+# Terraform CI/CD Examples
+
 TerraformのCI/CD例をまとめる
+
+## Setup
+
+### Terraformインストール
+
+[Install Terraform](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli#install-terraform)
+
+インストール方法は問いません。  
+ここでは[mise](https://mise.jdx.dev/getting-started.html) でのインストールを推奨します。インストール方法はリンクを参照してください。
+
+```console
+mise use terraform@1.13.5
+```
+
+### 推奨: ProviderのCacheディレクトリの指定
+
+通常、TerraformのProviderは `terraform init`を実行したディレクトリ毎の `.terraform` ディレクトリにProvider処理を実行するためのバイナリをダウンロードします。  
+個別にダウンロードするとPCのストレージを圧迫するため、ホームディレクトリでCacheディレクトリを指定しておくのがオススメです。
+
+```console
+export TF_PLUGIN_CACHE_DIR=$HOME/.terraform.d/plugin-cache
+```
+
+### 事前準備: Remote state用のバケットの作成
+
+ローカル環境の認証情報を用いて、バケットを作成します。  
+この時点では、ひとまずtfstateはローカル環境で管理します。
+
+例: AWS認証を実行
+
+```console
+aws sso login --profile xxx
+```
+
+バケットを作成
+
+```console
+cd _tfstate
+terraform init
+terraform apply
+```
+
+作成されたバケット名を控えます。
+
+```console
+Outputs:
+
+tfstate_bucket_name = "tf-s3-bucket-xxx"
+```
+
+ディレクトリを戻る。
+
+```console
+cd -
+```
+
+### 事前準備: OIDC連携用のIAM Role作成
+
+OIDC連携に用いるIAM Roleを作成します。
+
+backend定義をコンフィグファイルから作成します。
+
+```console
+cd _oidc
+cp backend.hcl.example backend.hcl
+vi backend.hcl
+
+bucket = "< Outputsのtfstate_bucket_nameで控えたバケット名 >"
+key    = "oidc/terraform.tfstate"
+region = "us-east-1"
+```
+
+初期設定します。
+
+```console
+terraform init -backend-config=backend.hcl
+```
+
+リソースを作成します。
+
+```console
+terraform apply
+```
+
+## リソース構築
+
+backend定義をコンフィグファイルから作成します。
+
+```console
+cd _oidc
+cp backend.hcl.example backend.hcl
+vi backend.hcl
+
+bucket = "< Outputsのtfstate_bucket_nameで控えたバケット名 >"
+key    = "oidc/terraform.tfstate"
+region = "us-east-1"
+```
+
+初期設定します。
+
+```console
+terraform init -backend-config=backend.hcl
+```
+
+TBD。。。GitHub Actions定義をコピーして、お好みのリポジトリで使う方法をまとめる予定。
