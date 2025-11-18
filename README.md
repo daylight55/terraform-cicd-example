@@ -70,7 +70,7 @@ vi backend.hcl
 
 bucket = "<Outputsのtfstate_bucket_nameで控えたバケット名>"
 key    = "oidc/terraform.tfstate"
-region = "us-east-1"
+region = "ap-northeast-1"
 ```
 
 初期設定します。
@@ -109,7 +109,7 @@ vi backend.hcl
 
 bucket = "< Outputsのtfstate_bucket_nameで控えたバケット名 >"
 key    = "oidc/terraform.tfstate"
-region = "us-east-1"
+region = "ap-northeast-1"
 ```
 
 初期設定します。
