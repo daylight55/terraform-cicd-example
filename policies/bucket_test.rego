@@ -44,3 +44,8 @@ test_allow_when_region_set_via_tag if {
   denies := s3_region.deny with input as valid_plan
   count(denies) == 0
 }
+
+test_current_plan_keeps_buckets_in_tokyo if {
+  denies := s3_region.deny with input as data.testdata.current_plan
+  count(denies) == 0
+}

@@ -4,4 +4,8 @@ resource "random_pet" "this" {
 
 resource "aws_s3_bucket" "example" {
   bucket = "example-bucket-${random_pet.this.id}"
+
+  tags = {
+    Region = "us-east-1"
+  }
 }
