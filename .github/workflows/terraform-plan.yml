@@ -23,7 +23,6 @@ jobs:
           terraform_version: 1.13.5
 
       - name: Configure AWS credentials (plan)
-        if: github.event_name == 'pull_request'
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_TERRAFORM_PLAN_ROLE }}
@@ -32,7 +31,7 @@ jobs:
 
       - name: Terraform Init
         run: |
-          terraform init -migrate-state\
+          terraform init -migrate-state \
             -backend-config="bucket=${{ secrets.TF_BACKEND_S3_BUCKET }}" \
             -backend-config="key=root/terraform.tfstate" \
             -backend-config="region=${{ env.AWS_REGION }}"
