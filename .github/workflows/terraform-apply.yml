@@ -41,26 +41,6 @@ jobs:
       - name: Terraform Validate
         run: terraform validate
 
-      - name: Get pull-request number
-        uses: actions/github-script@v8
-        id: get_pr_number
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          script: |
-            if ( context.issue.number ) {
-              return context.issue.number;
-            } else {
-              return (
-                await github.rest.repos.listPullRequestsAssociatedWithCommit({
-                  commit_sha: context.sha,
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                })
-              ).data[0].number;
-            }
-          result-encoding: string
-
       - uses: shmokmt/actions-setup-tfcmt@v2
         with:
           version: v4.13.0
@@ -68,4 +48,6 @@ jobs:
       - name: Terraform Apply
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: tfcmt apply -- terraform apply -auto-approve -no-color -input=false
+        run: |
+          tfcmt apply \
+          -- terraform apply -auto-approve -no-color -input=false
