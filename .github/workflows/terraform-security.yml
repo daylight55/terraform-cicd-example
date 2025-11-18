@@ -1,0 +1,41 @@
+name: Security
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  pull-requests: write     # reviewdog / tfcmt / Infracost コメント用
+  security-events: write   # （必要なら）SARIF を Code Scanning に上げるとき用
+
+jobs:
+
+  security:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+
+      - name: Run Trivy (config scan)
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: config
+          format: sarif
+          output: trivy.sarif
+
+      - name: Setup reviewdog
+        uses: reviewdog/action-setup@v1
+        with:
+          reviewdog_version: latest
+
+      - name: Comment trivy results via reviewdog
+        run: |
+          reviewdog \
+            -f=sarif -name="trivy" \
+            -reporter="github-pr-review" \
+            -filter-mode="diff_context" \
+            -level="error" \
+            < trivy.sarif

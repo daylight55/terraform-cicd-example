@@ -1,0 +1,43 @@
+name: Lint
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: write          # fmt / docs の自動コミット用
+  pull-requests: write     # reviewdog / tfcmt / Infracost コメント用
+  security-events: write   # （必要なら）SARIF を Code Scanning に上げるとき用
+
+jobs:
+
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+
+      - name: Install tflint
+        run: |
+          curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
+
+      - name: Run tflint (SARIF)
+        run: tflint --format sarif --out tflint.sarif
+
+      - name: Setup reviewdog
+        uses: reviewdog/action-setup@v1
+        with:
+          reviewdog_version: latest
+
+      - name: Comment tflint results via reviewdog
+        run: |
+          reviewdog \
+            -f=sarif \
+            -name="tflint" \
+            -reporter="github-pr-review" \
+            -filter-mode="diff_context" \
+            -level="error" \
+            < tflint.sarif
