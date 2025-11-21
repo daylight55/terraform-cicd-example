@@ -1,0 +1,56 @@
+name: Fmt and Docs
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: write          # fmt / docs の自動コミット用
+
+jobs:
+
+  fmt:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.9.5
+
+      - name: Terraform fmt
+        run: terraform fmt -recursive
+
+      - name: Commit fmt changes
+        run: |
+          if ! git diff --quiet; then
+            git config user.name  "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git commit -am "chore: terraform fmt"
+            git push
+          else
+            echo "No formatting changes"
+          fi
+
+  docs:
+    runs-on: ubuntu-latest
+    needs: fmt
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+
+      - name: Generate terraform-docs and push
+        uses: terraform-docs/gh-actions@v1.4.1
+        with:
+          working-dir: .
+          output-file: README.md
+          output-method: inject # <!-- BEGIN_TF_DOCS --> ... <!-- END_TF_DOCS --> を置き換え
+          git-push: 'true'
+          git-commit-message: 'chore: update terraform docs'
